@@ -17,7 +17,7 @@ Ensuite, j'ai réalisé un modèle simple qui permet seulement de déplacer les 
 ```
 %estDans(ZONE, ROBOT, ETAPE) = Le robot ROBOT est dans la zone ZONE à l'étape ETAPE
 1 {estDans(Z, R, 1) : zone(Z)} 1 :- robot(R). %on choisit les positions de départ des robots
-1 {estDans(Z_next,R,I) : zone(Z_next), Z != Z_next} 1 :- estDans(Z,R,I-1), etape(I). %n fait se déplacer les robots dans des zones différentes à l'étape suivante
+1 {estDans(Z_next,R,I) : zone(Z_next), Z != Z_next} 1 :- estDans(Z,R,I-1), etape(I). %on fait se déplacer les robots dans des zones différentes à l'étape suivante
 ```
 
 Ensuite, je rajoute le fait que chaque objet commence dans une zone :
@@ -39,7 +39,7 @@ Je fais en sorte que les robots puissent porter des objets et les ramener dans l
 On peut ensuite compter le nombre d'objets livrés et essayer de maximiser ce nombre :
 
 ```
-nb_obj_livre(N) :- N = #count{O : porte(O, R, I-1), etape(I)}. % le nombre d'objets livrés est le nombre d'objets qui ont été portés avant la dernière étape
+nb_obj_livre(N) :- N = #count{O : porte(O, R, I-1), etape(I)}. %le nombre d'objets livrés est le nombre d'objets qui ont été portés avant la dernière étape
 
 #maximize {N@1 : nb_obj_livre(N)}. %on maximise le nombre d'objets livrés
 ```
@@ -62,5 +62,7 @@ Cette modélisation est très simplifiée car le nombre de zones de départ n'a 
 
 Pour une deuxième modélisation, je rajoute des temps de trajet entre les zones et la zone de chargement, qui sont différents les uns des autres. De plus, la société de livraison propose un abonnement payant qui permet de prioriser sa commande. Ainsi, les commandes se voient maintenant attribuer des points de priorité, qui peuvent représenter le fait d'avoir un abonnement ou non, ou si la commande a été faite il y a longtemps. Ainsi, on va cette fois chercher à accumuler le plus de points de priorité en un temps imparti. À priorité de livraison égale, l'entreprise va tout de même chercher à maximiser son nombre de livraisons. Le nombre d'objet, le nombre de zone, la position des objets, la distance entre les zones est cette fois fixé. La deuxième modélisation peut être lancé avec la commande suivante :
 ```bash
-clingo logistique_V2.lp -c n=100 -c r=1 -V0
+clingo logistique_V2.lp -c n=100 -c r=5 -V0
 ```
+
+Le paramètre n représente le temps totale dont dispose les r robot(s). Si vous souhaitez modifier les autres paramètres, c'est possible en modifiant directement le fichier "logistique_V2.lp". Des commentaires y sont présents pour expliquer les changements par rapport à la V1.

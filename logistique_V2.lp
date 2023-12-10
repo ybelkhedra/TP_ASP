@@ -30,7 +30,6 @@ priorite(8,10).
 priorite(9,20).
 priorite(10,20).
 
-
 %on définit l'emplacement initial des objets
 contient(1,5).
 contient(2,2).
@@ -45,18 +44,19 @@ contient(10,5).
 
 %règles
 
-1 {estDans(Z, R, 1) : zone(Z)} 1 :- robot(R). %on choisit les positions de departs des robots
+1 {estDans(Z, R, 1) : zone(Z)} 1 :- robot(R). %on choisit les positions de départs des robots
 
+%Par soucis de simplicité, on considère que les robots ne se déplacent qu'entre la zone de chargement et les autres zones
 {estDans(Z_next,R,I) : zone_chargement(Z_next), Z != Z_next} 1 :- distance(Z, Z_next, T), temps(I), estDans(Z,R,I-T). %on fait se deplacer un robort vers la zone de chargement
 {estDans(Z_next,R,I) : zone(Z_next), Z != Z_next} 1 :- distance(Z, Z_next, T), temps(I), estDans(Z,R,I-T), zone_chargement(Z). %on fait se deplacer les robots depuis la zone de chargement vers les autres zones
-:- estDans(Z1,R,I), estDans(Z2,R,I), Z1 != Z2. %un robot ne peut pas etre dans deux zones differentes a la meme etape
+:- estDans(Z1,R,I), estDans(Z2,R,I), Z1 != Z2. %un robot ne peut pas être dans deux zones differentes à la meme etape
 
 {porte(O, R, I)} 1 :- estDans(Z,R,I), contient(O,Z). %un robot peut ramasser un objet qui se trouve dans la zone dans laquelle il se trouve
-:- {porte(O,R,I): objet(O)} > 1, robot(R), temps(I). % un robot ne peut porter qu'un objet à la fois a un temps donné
-:- {porte(O, R, I): robot(R), temps(I)} > 1, objet(O). % un objet ne peut etre porté que par un seul robot
+:- {porte(O,R,I): objet(O)} > 1, robot(R), temps(I). %un robot ne peut porter qu'un objet à la fois à un temps donné
+:- {porte(O, R, I): robot(R), temps(I)} > 1, objet(O). %un objet ne peut être porté que par un seul robot
 1 {estDans(Z, R, I) : zone_chargement(Z)} 1 :- temps(I), estDans(Z_, R, I-T), distance(Z_, Z, T), porte(O,R,I-T). %un robot qui porte un objet part dans la zone de chargement s'il lui reste du temps
 
-estLivre(O, I) :- temps(I), estDans(Z_, R, I-T), distance(Z_, Z, T), porte(O,R,I-T). %un objet est livré si il est porté par un robot et qu'il lui reste le temps d'aller vers la zone de chargement
+estLivre(O, I) :- temps(I), estDans(Z_, R, I-T), distance(Z_, Z, T), porte(O,R,I-T). %un objet est livré s'il est porté par un robot et qu'il lui reste le temps d'aller vers la zone de chargement
 
 nb_obj_livre(N) :- N = #count{O : estLivre(O, _)}. % le nombre d'objets livrés est le nombre d'objets qui ont été porté avant la dernire etape
 satisfacion_tot(S) :- S = #sum{P,O : priorite(O,P), estLivre(O, _)}. %la satisfaction totale est la somme des priorités des objets livrés
