@@ -11,11 +11,6 @@ distance(2,6,5).
 distance(3,6,10).
 distance(4,6,20).
 distance(5,6,50).
-% distance(1,6,5).
-% distance(2,6,5).
-% distance(3,6,5).
-% distance(4,6,5).
-% distance(5,6,5).
 distance(X,Y,T) :- X != Y, distance(Y,X,T). %on considère que les temps de parcours sont symétriques
 
 %on définit les priorités des zones  de chargement
@@ -56,10 +51,10 @@ contient(10,5).
 :- {porte(O, R, I): robot(R), temps(I)} > 1, objet(O). %un objet ne peut être porté que par un seul robot
 1 {estDans(Z, R, I) : zone_chargement(Z)} 1 :- temps(I), estDans(Z_, R, I-T), distance(Z_, Z, T), porte(O,R,I-T). %un robot qui porte un objet part dans la zone de chargement s'il lui reste du temps
 
-estLivre(O, I) :- temps(I), estDans(Z_, R, I-T), distance(Z_, Z, T), porte(O,R,I-T). %un objet est livré s'il est porté par un robot et qu'il lui reste le temps d'aller vers la zone de chargement
+estLivreOTR(O, I, R) :- temps(I), estDans(Z_, R, I-T), distance(Z_, Z, T), porte(O,R,I-T). %un objet est livré s'il est porté par un robot et qu'il lui reste le temps d'aller vers la zone de chargement
 
-nb_obj_livre(N) :- N = #count{O : estLivre(O, _)}. % le nombre d'objets livrés est le nombre d'objets qui ont été porté avant la dernire etape
-satisfacion_tot(S) :- S = #sum{P,O : priorite(O,P), estLivre(O, _)}. %la satisfaction totale est la somme des priorités des objets livrés
+nb_obj_livre(N) :- N = #count{O : estLivreOTR(O, _, _)}. % le nombre d'objets livrés est le nombre d'objets qui ont été porté avant la dernire etape
+satisfacion_tot(S) :- S = #sum{P,O : priorite(O,P), estLivreOTR(O, _, _)}. %la satisfaction totale est la somme des priorités des objets livrés
 
 #maximize {N@1 : nb_obj_livre(N)}. %on maximise le nombre d'objets livrés
 #maximize {S@2 : satisfacion_tot(S)}. %on maximise la satisfaction totale en priorité
@@ -67,7 +62,7 @@ satisfacion_tot(S) :- S = #sum{P,O : priorite(O,P), estLivre(O, _)}. %la satisfa
 % #show distance/3.
 % #show estDans/3.
 % #show contient/2.
-% #show porte/3.
-#show estLivre/2.
+#show porte/3.
+#show estLivreOTR/3.
 #show nb_obj_livre/1.
 #show satisfacion_tot/1.
